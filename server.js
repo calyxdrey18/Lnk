@@ -17,15 +17,15 @@ if (fs.existsSync(DATA_FILE)) {
 }
 
 app.post('/submit', upload.single('groupImage'), (req, res) => {
-  const { groupName, groupLink } = req.body;
-  if (groupLink && groupLink.includes('https://chat.whatsapp.com/')) {
-    let imagePath = req.file ? `/uploads/${req.file.filename}` : null;
-    links.push({ groupName, groupLink, imagePath });
-    fs.writeFileSync(DATA_FILE, JSON.stringify(links, null, 2));
-    res.sendStatus(200);
-  } else {
-    res.status(400).send('Invalid WhatsApp group link.');
-  }
+  const { username, groupName, groupLink } = req.body;
+  if (!username || username.trim() === '') return res.status(400).send('Username is required.');
+  if (!groupName || groupName.trim() === '') return res.status(400).send('Group name is required.');
+  if (!groupLink || !groupLink.includes('https://chat.whatsapp.com/')) return res.status(400).send('Invalid WhatsApp group link.');
+
+  let imagePath = req.file ? `/uploads/${req.file.filename}` : null;
+  links.push({ username: username.trim(), groupName: groupName.trim(), groupLink: groupLink.trim(), imagePath });
+  fs.writeFileSync(DATA_FILE, JSON.stringify(links, null, 2));
+  res.sendStatus(200);
 });
 
 app.get('/links', (req, res) => {
@@ -39,3 +39,5 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}/`);
 });
+
+
