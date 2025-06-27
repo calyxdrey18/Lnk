@@ -2,7 +2,7 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
@@ -20,7 +20,7 @@ app.post('/submit', (req, res) => {
   if (groupLink && groupLink.includes('https://chat.whatsapp.com/')) {
     links.push({ groupName, groupLink });
     fs.writeFileSync(DATA_FILE, JSON.stringify(links, null, 2));
-    res.redirect('/');
+    res.sendStatus(200);
   } else {
     res.status(400).send('Invalid WhatsApp group link.');
   }
@@ -28,6 +28,11 @@ app.post('/submit', (req, res) => {
 
 app.get('/links', (req, res) => {
   res.json(links);
+});
+
+// Serve index.html for root
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 app.listen(port, () => {
