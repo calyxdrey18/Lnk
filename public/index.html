@@ -4,37 +4,227 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tech WhatsApp Groups</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    body { font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; }
-    .group { margin-bottom: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
-    a { color: #007bff; text-decoration: none; }
-    a:hover { text-decoration: underline; }
-    input, button { padding: 8px; margin: 5px 0; width: 100%; }
-    button { background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
-    .msg { margin: 10px 0; padding: 10px; border-radius: 4px; }
-    .success { background: #d4edda; color: #155724; }
-    .error { background: #f8d7da; color: #721c24; }
-    .loading { opacity: 0.5; pointer-events: none; }
+    :root {
+      --primary: #007bff;
+      --success: #28a745;
+      --error: #dc3545;
+      --light: #f8f9fa;
+      --dark: #343a40;
+    }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f5f7fa;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    h1 {
+      color: var(--dark);
+      font-size: 2.2rem;
+      margin-bottom: 10px;
+    }
+    .subtitle {
+      color: #6c757d;
+      margin-bottom: 30px;
+    }
+    .form-container {
+      background: white;
+      border-radius: 10px;
+      padding: 25px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      margin-bottom: 30px;
+    }
+    .form-row {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+      color: var(--dark);
+    }
+    input, button {
+      width: 100%;
+      padding: 10px 15px;
+      border-radius: 6px;
+      border: 1px solid #ced4da;
+      font-size: 1rem;
+      transition: all 0.3s;
+    }
+    input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0,123,255,0.25);
+      outline: none;
+    }
+    button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      margin-top: 10px;
+    }
+    button:hover {
+      background: #0069d9;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .loading {
+      opacity: 0.7;
+      pointer-events: none;
+    }
+    .msg {
+      margin: 10px 0;
+      padding: 10px 15px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+    }
+    .success {
+      background: #d4edda;
+      color: #155724;
+    }
+    .error {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    .search-container {
+      margin-bottom: 30px;
+      position: relative;
+    }
+    .search-container input {
+      padding-left: 40px;
+    }
+    .search-container i {
+      position: absolute;
+      top: 50%;
+      left: 15px;
+      transform: translateY(-50%);
+      color: #6c757d;
+    }
+    .groups-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+    }
+    .group-card {
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      transition: all 0.3s ease;
+    }
+    .group-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+    .group-img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+      background: #e9ecef;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .group-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .group-info {
+      padding: 15px;
+    }
+    .group-name {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 5px;
+      color: var(--dark);
+    }
+    .group-link {
+      display: inline-block;
+      background: var(--primary);
+      color: white;
+      padding: 8px 15px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 500;
+      margin-top: 10px;
+      transition: all 0.2s;
+    }
+    .group-link:hover {
+      background: #0069d9;
+    }
+    .empty-state {
+      text-align: center;
+      color: #6c757d;
+      margin: 40px 0;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .group-card {
+      animation: fadeIn 0.4s ease-out forwards;
+    }
+    .group-card:nth-child(odd) { animation-delay: 0.1s; }
+    .group-card:nth-child(even) { animation-delay: 0.2s; }
   </style>
 </head>
 <body>
-  <h1>Tech WhatsApp Groups</h1>
-  <form id="groupForm">
-    <input type="text" name="groupName" placeholder="Group Name (e.g. Tech Talk)" required>
-    <input type="url" name="groupLink" placeholder="WhatsApp Group Link" required>
-    <button type="submit">Submit</button>
-    <div id="formMsg"></div>
-  </form>
-  <button id="refreshBtn">Refresh Groups</button>
-  <div id="groupList"></div>
+  <div class="container">
+    <header>
+      <h1>Tech WhatsApp Groups</h1>
+      <p class="subtitle">Find and share tech groups easily</p>
+    </header>
+
+    <div class="form-container">
+      <form id="groupForm">
+        <div class="form-row">
+          <label for="groupName">Group Name</label>
+          <input type="text" id="groupName" name="groupName" placeholder="Tech Talk" required>
+        </div>
+        <div class="form-row">
+          <label for="groupLink">WhatsApp Group Link</label>
+          <input type="url" id="groupLink" name="groupLink" placeholder="https://chat.whatsapp.com/..." required>
+        </div>
+        <button type="submit">Submit</button>
+        <div id="formMsg"></div>
+      </form>
+    </div>
+
+    <div class="search-container">
+      <i class="fas fa-search"></i>
+      <input type="text" id="searchInput" placeholder="Search groups...">
+    </div>
+
+    <div class="groups-container" id="groupList"></div>
+  </div>
+
   <script>
     const form = document.getElementById('groupForm');
-    const refreshBtn = document.getElementById('refreshBtn');
+    const searchInput = document.getElementById('searchInput');
     const groupList = document.getElementById('groupList');
     const formMsg = document.getElementById('formMsg');
 
-    refreshBtn.addEventListener('click', loadGroups);
+    // Load groups on page load
+    loadGroups();
 
+    // Search functionality
+    searchInput.addEventListener('input', () => {
+      loadGroups(searchInput.value.toLowerCase());
+    });
+
+    // Submit new group
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       form.classList.add('loading');
@@ -45,8 +235,9 @@
           body: new URLSearchParams(formData)
         });
         if (res.ok) {
-          formMsg.innerHTML = '<div class="msg success">Group added!</div>';
+          formMsg.innerHTML = '<div class="msg success">Group added successfully!</div>';
           loadGroups();
+          form.reset();
         } else {
           const data = await res.text();
           formMsg.innerHTML = `<div class="msg error">${data}</div>`;
@@ -58,29 +249,56 @@
       }
     });
 
-    async function loadGroups() {
-      groupList.innerHTML = '<p>Loading groups...</p>';
+    // Load and display groups
+    async function loadGroups(searchTerm = '') {
+      groupList.innerHTML = '<p class="empty-state">Loading groups...</p>';
       try {
         const res = await fetch('/links');
         if (res.ok) {
           const groups = await res.json();
           groupList.innerHTML = '';
           if (groups.length === 0) {
-            groupList.innerHTML = '<p>No groups yet. Add one above!</p>';
+            groupList.innerHTML = '<p class="empty-state">No groups yet. Add one above!</p>';
           } else {
-            groups.forEach(group => {
-              const div = document.createElement('div');
-              div.className = 'group';
-              div.innerHTML = `<strong>${group.groupName}</strong> — <a href="${group.groupLink}" target="_blank">Join Group</a>`;
-              groupList.appendChild(div);
-            });
+            const filtered = groups.filter(group =>
+              group.groupName.toLowerCase().includes(searchTerm) ||
+              group.groupLink.toLowerCase().includes(searchTerm)
+            );
+            if (filtered.length === 0) {
+              groupList.innerHTML = '<p class="empty-state">No groups found.</p>';
+            } else {
+              filtered.forEach(group => {
+                const card = document.createElement('div');
+                card.className = 'group-card';
+                // Use Gravatar as placeholder for group image
+                const gravatar = `https://www.gravatar.com/avatar/${md5(group.groupName)}?d=identicon&s=200`;
+                card.innerHTML = `
+                  <div class="group-img">
+                    <img src="${gravatar}" alt="${group.groupName}">
+                  </div>
+                  <div class="group-info">
+                    <div class="group-name">${group.groupName}</div>
+                    <a href="${group.groupLink}" class="group-link" target="_blank">Join Group</a>
+                  </div>
+                `;
+                groupList.appendChild(card);
+              });
+            }
           }
         }
       } catch (err) {
-        groupList.innerHTML = '<div class="msg error">Failed to load groups. Try again.</div>';
+        groupList.innerHTML = '<p class="empty-state">Failed to load groups. Try again.</p>';
       }
     }
-    loadGroups();
+
+    // Simple MD5 function for Gravatar (not secure, for demo only)
+    function md5(string) {
+      return Array.from(new TextEncoder().encode(string))
+        .reduce((hash, byte) => {
+          hash = ((hash << 5) - hash) + byte;
+          return hash & hash;
+        }, 0).toString(16).replace('-', '');
+    }
   </script>
 </body>
 </html>
