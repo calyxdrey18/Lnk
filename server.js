@@ -10,7 +10,6 @@ app.use(express.static('public'));
 let links = [];
 const DATA_FILE = path.join(__dirname, 'links.json');
 
-// Load existing links
 if (fs.existsSync(DATA_FILE)) {
   links = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
 }
@@ -30,7 +29,6 @@ app.get('/links', (req, res) => {
   res.json(links);
 });
 
-// Serve index.html for root
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
