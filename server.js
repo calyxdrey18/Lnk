@@ -1,9 +1,11 @@
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
+const multer = require('multer');
 const app = express();
 const port = process.env.PORT || 3000;
 
+const upload = multer({ dest: 'public/uploads/' });
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
@@ -14,10 +16,11 @@ if (fs.existsSync(DATA_FILE)) {
   links = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
 }
 
-app.post('/submit', (req, res) => {
+app.post('/submit', upload.single('groupImage'), (req, res) => {
   const { groupName, groupLink } = req.body;
   if (groupLink && groupLink.includes('https://chat.whatsapp.com/')) {
-    links.push({ groupName, groupLink });
+    let imagePath = req.file ? `/uploads/${req.file.filename}` : null;
+    links.push({ groupName, groupLink, imagePath });
     fs.writeFileSync(DATA_FILE, JSON.stringify(links, null, 2));
     res.sendStatus(200);
   } else {
