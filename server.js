@@ -1,0 +1,35 @@
+const express = require('express');
+const fs = require('fs');
+const path = require('path');
+const app = express();
+const port = 3000;
+
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static('public'));
+
+let links = [];
+const DATA_FILE = path.join(__dirname, 'links.json');
+
+// Load existing links
+if (fs.existsSync(DATA_FILE)) {
+  links = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+}
+
+app.post('/submit', (req, res) => {
+  const { groupName, groupLink } = req.body;
+  if (groupLink && groupLink.includes('https://chat.whatsapp.com/')) {
+    links.push({ groupName, groupLink });
+    fs.writeFileSync(DATA_FILE, JSON.stringify(links, null, 2));
+    res.redirect('/');
+  } else {
+    res.status(400).send('Invalid WhatsApp group link.');
+  }
+});
+
+app.get('/links', (req, res) => {
+  res.json(links);
+});
+
+app.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}/`);
+});
